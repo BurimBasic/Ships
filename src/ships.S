@@ -1149,8 +1149,8 @@ patch_background_tile:
     shl ax,1
     xchg bx,ax
     # AX=x center of tile, BX=y center of tile
-    add ax,8
-    add bx,8
+    add ax,7
+    add bx,7
     call restore_box
     pop dx
     pop cx
