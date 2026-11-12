@@ -1,0 +1,14 @@
+name: DOS XT CGA Build (8086)
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  compile-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble and statically validate 8086 DOS binary
+        run: make clean all test
+      - name: Check verified DOSBox-tested image SHA256
+        run: echo "d3b4e9c130dfbb54effbad3d33f91d806ce4d6e93ca2aa2d50caf2e07ea2f575  dist/SHIPS.COM" | sha256sum -c -
