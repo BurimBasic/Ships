@@ -6,9 +6,9 @@
 
 ## Real DOSBox-X CGA captures
 
-<escape>![Real DOSBox-X screen at wave start, v0.7](docs/screenshots/ships-v07-boot.png)</escape>
+![Real DOSBox-X screen at wave start, v0.7](docs/screenshots/ships-v07-boot.png)
 
-<escape>![Real DOSBox-X screen after 600 simulated game steps, v0.7](docs/screenshots/ships-v07-600-ticks.png)</escape>
+![Real DOSBox-X screen after 600 simulated game steps, v0.7](docs/screenshots/ships-v07-600-ticks.png)
 
 These are **actual CGA B800 video-memory captures** from the running 8086 executable on SLOW1, enlarged with nearest-neighbor sampling, **not concept art**. The second uses a 600-step diagnostic variant of the same game with additional simulation steps; its damaged harbor is an expected loss state without defensive play. This is visual and AI-progression evidence, not a full manually played victory or physical XT benchmark.
 
