@@ -1,26 +1,27 @@
-# SHIPS v0.7 — TESTING (12 November 2026)
+# SHIPS v0.8 testing evidence — 2026-11-13
 
-## Evidence actually collected
+**Release binary** `dist/SHIPS.COM` and SLOW1 `C:\Ships\SHIPS.COM`:
+- SHA256: `4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c`
+- Bytes: **41,172**
+- CPU: **8086/8088** (GNU `.arch i8086`, no 186+ instructions)
+- Video: **CGA 320×200, 4 colors**.
 
-1. GNU `as --32` with `.arch i8086` built `src/ships.S`; `ld -m elf_i386 -Ttext 0x100 --oformat binary` produced a valid **38,944-byte** DOS COM. The binary is below **57,344 bytes**. Rebuild SHA256: `d3b4e9c130dfbb54effbad3d33f91d806ce4d6e93ca2aa2d50caf2e07ea2f575`.
-2. On **SLOW1** with **DOSBox-X 2026.10.01**, CGA mode, emulated **8086**, fixed **240 cycles/ms**, `SHV07.COM /TEST` returned DOS **ERRORLEVEL 0** and logged `SHIPS /TEST PASS`.
-3. Captured actual 16,384-byte B800 VRAM at start / after 120 simulation steps, converted without filtering to PNG. Viewed the captures manually and verified ship sprites, navy-blue sea, land, rocks, wake and HUD.
-4. A dedicated diagnostic candidate, **not the shipped binary**, adjusted just the `/CAP` simulation count from 120 to 600 steps. Three initial enemy coordinates changed substantially, including one arriving around **(135,138)**; a later frame visibly showed **HARBOR LOST**. This confirms enemy movement and loss behavior, not balancing or a complete win.
-5. Atomic-on-volume installation on SLOW1: `C:\Ships\SHIPS.COM`, exactly 38,944 bytes. Previous COM backed up under `C:\Ships\backups\`. Installed `SHIPS.COM /TEST` reran in DOSBox-X at 240 cycles/ms and **PASS**; post-install SHA256 matched. SLOW1's separate TANKS directory was untouched.
+## Test sequence
 
-## Not yet accepted
+1. Build on SLOW1 using MSYS2 GNU Binutils 2.47 (`as --32`, PE intermediate with custom DOS image linker script, `objcopy -O binary`); the resulting COM was 41,172 bytes. The source is independently buildable with Linux `make clean all test`.
+2. On DOSBox-X 2026.10.01, 8086, CGA, `cycles=fixed 240`: `SHV13.COM /TEST` produced `SHIPS /TEST PASS` and exit code 0.
+3. **Unattended 600-step /CAP run** in DOSBox-X, 8086, CGA at 2000 cycles/ms; saved 3 B800 VRAM frames and all four 12-byte enemy records at six sampling points. No overlaps found at samples 100,200,300,400,500,600, using a 23×21 hull-spacing check.
+4. At step 600, the four active enemies were in distinct positions: **(136,109), (88,136), (184,136), (136,88)**. Recorded movement in multiple earlier intervals; no standing stack at the harbor.
+5. Actual video framebuffer PNGs were viewed and compared. The original visible erase–draw–erase phase was eliminated in source; new board uses dirty spans from an offscreen 16KB DOS memory allocation.
+6. Paired performance run on same SLOW1 and DOSBox-X profile, 120-step diagnostic `/CAP`, fixed240: v0.7 7.724s and 7.720s, median 7.722s; v0.8 9.576s and 9.558s, median 9.567s, ratio 1.239. Faster than the intermediate 13.47s candidate, still **24% slower than old v0.7** at this artificial low-cycles stress profile. Do not conflate this with measured actual XT FPS.
 
-- Physical IBM PC XT 4.77 MHz speed and memory checks; 240 emulator cycles/ms is a repeatable testing configuration, **not proof of a real 8088's instruction timing**.
-- Complete player-controlled stage clear, 10-minute input/audio endurance, cooperative mode, native EGA/VGA.
-- Full future audio: AdLib, Sound Blaster auto detection, music. Only PC Speaker effects implemented.
-- No unrelated adapter screenshot should be fabricated. Use actual screenshots per backend when a backend exists.
+## Correctness caveats
 
-## Repro commands (SLOW1)
+- No-input simulations intentionally lose the harbor when an enemy shell reaches it. They **do not** prove a human can win wave 1 or that all 12 enemies can be sunk.
+- The 600-step simulation checks *sampled* positions, not every intermediate frame. The object collision routine separately rejects a 23×21 predicted hull overlap before movement.
+- Emulated cycles and DOSBox-X do not certify actual IBM PC XT timings. Real XT 4.77MHz testing and controlled keypress/audio tests still needed.
+- Native EGA/VGA, automatic AdLib/Sound Blaster detection and original music are **not yet implemented**.
 
-`C:\Ships\RUN-CGA.cmd` — interactive DOSBox-X CGA/8086.
+## Rollback
 
-`C:\Ships\RUN-XT.cmd` — lower-speed diagnostic profile.
-
-From a separate DOSBox-X CGA machine: mount `C:\Ships` as C:, run `SHIPS.COM /TEST`, inspect ERRORLEVEL immediately (zero is PASS). Run `SHIPS.COM` without parameters for manual play. Use R for restart and P for pause.
-
-Static Linux CI checks `make clean all test` and exact binary SHA. CI is not a substitute for DOSBox gameplay checks.
+On SLOW1 the previous installed SHIPS.COM is backed up under `C:\Ships\backups\`. Use a separate folder from TANKS. Never overwrite installed release before release checksum and `/TEST` are successful.

@@ -1,14 +1,14 @@
-name: DOS XT CGA Build (8086)
+name: DOS XT 8086 CGA build
 on:
   push:
     branches: [main]
   pull_request:
 jobs:
-  compile-check:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble and statically validate 8086 DOS binary
+      - name: GNU as / ld 8086-only static build
         run: make clean all test
-      - name: Check verified DOSBox-tested image SHA256
-        run: echo "d3b4e9c130dfbb54effbad3d33f91d806ce4d6e93ca2aa2d50caf2e07ea2f575  dist/SHIPS.COM" | sha256sum -c -
+      - name: Verify tested v0.8 binary exactly matches rebuilt release
+        run: echo "4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c  dist/SHIPS.COM" | sha256sum -c -

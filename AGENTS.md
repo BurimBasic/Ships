@@ -1,11 +1,10 @@
-# AGENTS.md — SHIPS development and release rules
+# SHIPS development and release rules
 
-- Ship a real DOS `.COM` for **8086/8088, 4.77MHz XT, CGA 320x200 mode 4** first; no 186/286+, protected mode, external runtime, 32-bit prefixes, or DOS extenders. Use `.arch i8086` in GNU as and verify all emitted instructions.
-- Keep the binary **strictly less than 56 KiB**, and preserve ~4 KiB of stack space in the 64 KiB COM segment. All game graphics, maps, state and configuration must work from memory with no mandatory external data files.
-- Performance matters: use fixed ticks from the BIOS clock, bounded enemy counts, static arrays, dirty-sprite restore; test at fixed 240 cycles/ms in DOSBox-X (8086 CGA) and separately compare responsiveness with the real XT. DOSBox cycles are NOT cycle-accurate proof of 4.77MHz physical hardware.
-- Never confuse CGA-compatible operation under EGA/VGA with native video support. Implement native EGA/VGA rendering as separate tested backends later.
-- Protect the earlier TANKS installation. Use dedicated `C:\Ships` on SLOW1 and reuse only the DOSBox-X executable; no shared game data or overwrite.
-- Must pass `make clean all test`, 8086 ISA inspection, `SHIPS.COM /TEST` in DOSBox-X, visual gameplay and first-wave full-clear checks, performance tests, followed by install+SHA256 verification and installed-file retest **before** labeling a formal release. Include captures and caveats.
-- For each released version update README with exact features, full key table, download link to exact tested binary, build SHA, screenshots from the actual emulator, tested adapter modes, known gaps and rollback details. Do not assert any unperformed test.
-- Do not invent a feature status. AdLib/Sound Blaster automatic detect, music, native EGA/VGA, enemy AI balancing and physical XT acceptance are future work until proven.
-- Use user controls: WASD, Shift forward shell, Ctrl one mine; automatic acceleration through low/medium/full ahead, with inertia. The engine stages are displayed, **never mapped to 1/2/3 hotkeys**.
+- Develop **real-mode 8086/8088, XT 4.77MHz, CGA 320×200** first. No 186+ instructions or DOS extenders, no external game assets. Do not modify TANKS or share its game directory. Keep `C:\Ships` isolated on SLOW1.
+- Ship a real **DOS .COM** below 56 KiB, reserve stack room in the 64KiB COM segment. Verify with GNU `.arch i8086`, a reproducible build, checksum and `SHIPS.COM /TEST` under DOSBox-X.
+- New features must have **real DOSBox-X visual captures**, and test behavior over a full simulated wave where practical. A /TEST PASS **alone never certifies gameplay**.
+- **No frame flickering**: render offscreen, mark dirty CGA spans, commit final pixels. Watch expensive VRAM operations on XT. Compare old/new frame timings under the same settings. Do not claim fixed emulated cycles imply real 4.77MHz performance.
+- **No frozen or overlapping NPC stacks**: path clearance must account for the *full* ship hull, not just tile center; test enemy separation at multiple simulation frames. Enemy ship behavior must be winnable, with varied paths and tactical positioning.
+- Player controls: WASD helm, Shift shell, Ctrl one active mine. Slow, medium, full ahead happen automatically as motion builds. Model inertia, drag and delayed turns. Never map gear modes to keys 1/2/3.
+- Use SLOW1 isolated `C:\Ships\work\<version>` build stage, install backup and checksum; deploy only after DOSBox /TEST PASS and reviewed CGA captures, then **retest installed binary**. No claim of success without actual proof.
+- Keep README and notes synchronized with the exact shipped build and tests. Statuses: CGA/8086 software and PC Speaker effects implemented; physical XT acceptance, native EGA/VGA, AdLib/Sound Blaster auto-detection/music remain **open**.

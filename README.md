@@ -1,60 +1,39 @@
-# SHIPS — Naval Harbor Defense (DOS / IBM PC XT)
+# SHIPS — Harbor Defense for IBM PC XT / CGA
 
-**v0.7 — 12 November 2026.** A standalone, original 16-bit DOS **8086/8088 CGA** arcade naval-defense game. Developed for the IBM PC XT 4.77 MHz target. [Download the verified `SHIPS.COM` binary](dist/SHIPS.COM) (38,944 bytes, SHA256 `d3b4e9c130dfbb54effbad3d33f91d806ce4d6e93ca2aa2d50caf2e07ea2f575`).
+**Developer release v0.8, 13 November 2026.** Standalone real-mode DOS 8086/8088 game; original top-down destroyer and submarine combat. **[Download the exact tested SHIPS.COM](dist/SHIPS.COM)** (41,172 bytes, SHA256 `4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c`).
 
-**On SLOW1:** start **`C:\Ships\RUN-CGA.cmd`**. `RUN-XT.cmd` switches to the lower 240 cycles/ms diagnostic profile. DOSBox-X 2026.10.01 is reused from the separate TANKS installation; no TANKS files are modified. Both launchers load the exact verified `C:\Ships\SHIPS.COM`.
+## Real DOSBox-X frames
 
-## Real DOSBox-X CGA captures
+![Start of game from actual CGA B800 memory](docs/screenshots/ships-v08-start.png)
 
-![Real DOSBox-X screen at wave start, v0.7](docs/screenshots/ships-v07-boot.png)
+![120 simulation steps with moving destroyers, actual CGA B800 memory](docs/screenshots/ships-v08-step120.png)
 
-![Real DOSBox-X screen after 600 simulated game steps, v0.7](docs/screenshots/ships-v07-600-ticks.png)
+These are actual DOSBox-X 8086/CGA framebuffer captures (3× nearest-neighbor display), not image-generation artwork.
 
-These are **actual CGA B800 video-memory captures** from the running 8086 executable on SLOW1, enlarged with nearest-neighbor sampling, **not concept art**. The second uses a 600-step diagnostic variant of the same game with additional simulation steps; its damaged harbor is an expected loss state without defensive play. This is visual and AI-progression evidence, not a full manually played victory or physical XT benchmark.
+## Play
 
-## What is playable
+On **SLOW1**, the production executable is installed at `C:\Ships\SHIPS.COM`. Run `C:\Ships\RUN-XT.cmd` for the IBM XT nominal 4.77MHz **emulator approximation** or `C:\Ships\RUN-CGA.cmd` for the faster developer profile. The old `240 cycles/ms` test profile is deliberately **not** a playable XT speed profile. Exact DOSBox cycle values are not physical XT timing proof.
 
-Defend your **harbor** on a 16×12 logical sea chart; **a projectile hitting the harbor immediately loses the level**. You operate a detailed top-down destroyer (24×24 CGA pixels), with pointed bow, deck guns, bridge and wake. Enemy destroyers are also sizeable hulls; submarines show faint silhouettes/periscope and launch bubbling torpedoes. Twelve opponents arrive during the first wave, up to four concurrently.
+- **WASD:** control the helm and thrust. The bow/heading turns with a **delayed rudder**, longer when moving fast; the destroyer automatically accelerates through slow, medium and full ahead. Releasing the keys coasts to a stop. Speed stages are *internal*, not keys.
+- **Shift:** one forward shell at a time, limited travel distance and splash.
+- **Ctrl:** lay a mine; no second active mine until the existing one detonates.
+- **P:** pause; **R:** restart; **Space:** advance on victory; **M:** toggle PC Speaker; **Esc:** exit.
 
-- Ocean is navigable; rocky reefs are **destroyable** by shellfire; sandbanks/land are impassable. The harbor has distinctive docks.
-- **Automatic acceleration through slow, medium, full ahead** as the ship continues moving. Thrust and drift are separate: releasing direction causes gradual slowdown, not an instantaneous stop. **1/2/3 are internal speed stages, not controls.** Turning does not instantly discard previous momentum. Moving surface ships leave a visible V-shaped wake.
-- The bow fires one shell at a time; another cannot launch until the old shell hits something or splashes after a limited range. A mine remains armed until detonation; only **one active mine** is allowed. Mines can destroy either side.
-- Collision with another hull costs a life. Player begins with three lives and respawns while reserve remains. Enemy destroyers and submarines have independent logic, gradually gain speed, pursue the harbor and commit to obstacle detours rather than endlessly pressing into the same reef.
-- PC Speaker effects; no external configuration or asset files needed. Sound can be toggled with M.
+Defend the harbor against destroyers and semi-submerged submarines with torpedoes. Ocean is free to navigate; reefs are shell-destructible, shallows/land block hulls. The harbor falls immediately if struck. Three player lives. There are 12 enemies in wave 1, up to four active.
 
-### Full controls
+## What's fixed since v0.7
 
-| Key | Function |
-|---|---|
-| **W A S D** | Apply thrust toward north, west, south or east; automatic slow/medium/full ahead and momentum |
-| **Left/right Shift** | Fire **forward**; one active shell, limited range |
-| **Ctrl** | Lay a mine; only after the previous one detonates |
-| **P** | Pause/resume |
-| **R** | Restart the campaign |
-| **Space** | Continue after clearing a stage |
-| **M** | Toggle PC Speaker effects |
-| **Esc** | Exit to DOS |
+- **No visible erase–draw–erase animation:** compose on an offscreen CGA buffer then transfer marked dirty scanline spans. The player hull is not artificially blinked during invulnerability.
+- **Heavy-destroyer motion:** rudder delay depending on momentum, gradual acceleration, lengthy coast; stable, visible wake.
+- **Fleet separation and real navigation:** four individual 16×12 clearance-aware shortest-path flow maps and four distinct attack stations (center / port side / starboard side / submarine), timed patrols, collision spacing, no four-ship crowd on one point. Wider sea lanes fit the real 24×24 hull.
+- **Fight pacing:** first spawn and successive arrivals are less frantic. NPCs aim toward harbor/player rather than firing continuously into empty ocean.
+- **Less CPU wasted than the first offscreen prototype:** measured 120-step /CAP at fixed 240 emulated cycles/ms: v0.7 median 7.72s, v0.8 9.57s (+24%, test workload). This is *not* an FPS measurement or real-hardware benchmark. The earlier unoptimized buffered candidate was 13.47s on the same profile.
 
-## Supported hardware, tested truthfully
+## Verified
 
-| Target | Current status |
-|---|---|
-| **8086 CGA 320×200, four colors (DOSBox-X)** | **Built; /TEST PASS; visual captures and 600-step enemy motion confirmed on SLOW1** |
-| Physical **IBM PC XT 4.77 MHz CGA** | Target; **not yet tested on physical hardware**, speed not certified |
-| EGA/VGA hardware displaying CGA mode 4 | Compatibility likely, **not separately accepted for v0.7** |
-| Native 16-color EGA / native 256-color VGA | **Not implemented** |
-| PC Speaker | Effects implemented |
-| AdLib OPL2 / Sound Blaster | **Planned, not implemented**, no claim of automatic detection yet |
+- `SHIPS.COM /TEST` under DOSBox-X 2026.10.01, 8086 + CGA 320×200: **PASS**.
+- 600-step unattended DOSBox-X simulation with enemy coordinates recorded at steps 100,200,300,400,500,600: **zero enemy hull overlaps** in the sampled positions, and movement to independent stations. The unattended test **loses the harbor** because the player does not defend it; this is not a witnessed human victory.
+- New executable size 41,172 bytes, below the 56 KiB 8086 COM budget. Original TANKS installation is separate and untouched.
+- GitHub Actions compiles the same original source `src/ships.S`, statically checks 8086 ISA and checks exact release binary checksum. See [detailed evidence](docs/TESTING.md).
 
-## Building and testing
-
-Requires GNU `as`, `ld`, `make`, `objdump`, Python 3:
-
-```sh
-make clean all test
-sha256sum dist/SHIPS.COM
-```
-
-The source is `src/ships.S` (real mode `.code16`, `.arch i8086`). Shipped image has 38,944 bytes, within the strict 56 KiB ceiling with stack margin. The deterministic DOS smoke test **`SHIPS.COM /TEST`** passed under DOSBox-X with CGA, 8086 CPU emulation and 240 cycles/ms. Do not confuse this with manual input or full-gameplay verification. Full test evidence, limits and next acceptance work: [testing](docs/TESTING.md), [development rules](AGENTS.md), [v0.7 notes](releases/v0.7/RELEASE-NOTES.md). License: MIT.
-
-**Known gaps:** more refined visual variety and motion tuning, a fully witnessed 12-enemy manual clear, physical XT timing, native EGA/VGA drivers, optional AdLib and Sound Blaster auto detection and music are outstanding. No screenshot is represented as a physically captured XT display.
+**Not yet certified:** physical XT 4.77MHz speed, long manual combat victory, native EGA/VGA renderers, AdLib or Sound Blaster auto-detection/music (PC Speaker effects exist). DOSBox-X CGA mode alone does not prove physical CGA behavior.
