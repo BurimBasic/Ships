@@ -13,26 +13,89 @@ _start:
 .equ EN_SIZE, 12
 .equ SHOT_SIZE, 8
 
-banner: .ascii "SHIPS v0.7  XT/CGA\r\n$"
+banner: .ascii "SHIPS v0.8  XT/CGA\r\n$"
 test_pass: .ascii "SHIPS /TEST PASS\r\n$"
 cap_a: .asciz "FR00.BIN"
 cap_b: .asciz "FR99.BIN"
 cap_mid: .asciz "FR40.BIN"
 cap_state: .asciz "STATE.BIN"
-spawn_x: .word 40,136,216
+cap_mem: .asciz "MEMSEG.BIN"
+cap_s100: .asciz "S100.BIN"
+cap_s200: .asciz "S200.BIN"
+cap_s300: .asciz "S300.BIN"
+cap_s400: .asciz "S400.BIN"
+cap_s500: .asciz "S500.BIN"
+cap_player: .asciz "PLAYER.BIN"
+spawn_x: .word 56,136,216
+.align 2
+# Navigation clearance uses the complete 24-pixel destroyer footprint.
+# The target is a standoff attack point, not the harbor itself.
+# Four distinct 24-pixel-clear tactical approaches, one per active enemy.
+nav_dir_0:
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,2,2,2,2,2,2,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,2,2,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,3,3,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,4,4,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,2,2,2,2,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,2,2,2,2,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,5,3,3,3,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,3,3,4,4
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+nav_dir_1:
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+ .byte 4,4,1,1,1,1,2,2,2,2,2,2,2,2,4,4
+ .byte 4,4,4,4,4,4,2,2,2,2,2,2,2,2,4,4
+ .byte 4,4,4,4,4,4,2,2,2,2,2,2,3,3,4,4
+ .byte 4,4,4,4,4,4,2,2,2,2,2,2,4,4,4,4
+ .byte 4,4,4,4,4,4,2,2,2,2,2,2,4,4,4,4
+ .byte 4,4,1,1,1,2,2,2,2,2,2,2,4,4,4,4
+ .byte 4,4,1,1,1,2,2,2,2,2,2,2,4,4,4,4
+ .byte 4,4,1,1,1,5,3,3,3,3,3,3,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,3,3,4,4
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+nav_dir_2:
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,1,1,1,2,2,2,4,4
+ .byte 4,4,4,4,4,4,1,1,1,1,1,2,2,2,4,4
+ .byte 4,4,4,4,4,4,1,1,1,1,1,2,3,3,4,4
+ .byte 4,4,4,4,4,4,1,1,1,1,1,2,4,4,4,4
+ .byte 4,4,4,4,4,4,1,1,1,1,1,2,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,1,1,1,2,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,1,1,1,2,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,1,1,1,5,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,3,3,4,4
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+nav_dir_3:
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
+ .byte 4,4,1,1,1,1,1,1,2,2,2,2,2,2,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,2,2,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,3,3,4,4
+ .byte 4,4,4,4,4,4,1,1,2,2,2,2,4,4,4,4
+ .byte 4,4,4,4,4,4,1,1,5,3,3,3,4,4,4,4
+ .byte 4,4,1,1,1,1,0,0,0,0,0,0,4,4,4,4
+ .byte 4,4,0,0,0,0,0,0,0,0,0,0,4,4,4,4
+ .byte 4,4,0,0,0,0,0,0,0,0,0,0,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,4,4,4,4
+ .byte 4,4,0,0,0,0,4,4,4,4,4,0,3,3,4,4
+ .byte 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 map_art:
- .ascii "LL.............L"
- .ascii "LL.............L"
- .ascii "L.......R......L"
- .ascii "L......R........"
- .ascii ".......R..LL...."
- .ascii "...RR.....LL...."
- .ascii "...R............"
- .ascii "...........RR..."
- .ascii "..LL.......R...."
- .ascii "..LL............"
- .ascii ".....R.D.D......"
- .ascii ".......DHD......"
+ .ascii "L..............L"
+ .ascii "L..............L"
+ .ascii "L..............L"
+ .ascii "L..RR..........L"
+ .ascii "L..RR..........L"
+ .ascii "L............R.L"
+ .ascii "L..............L"
+ .ascii "L............R.L"
+ .ascii "L............R.L"
+ .ascii "L..............L"
+ .ascii "L......D.D.....L"
+ .ascii "L......DHD.....L"
 # 16x16 original destroyer silhouettes, up/right/down/left, 16 CGA mask words each
 ship16_gfx:
  .word 0x0180,0x0180,0x03c0,0x07e0,0x0660,0x0ff0,0x0e70,0x0db0,0x0db0,0x0e70,0x0ff0,0x07e0,0x0660,0x07e0,0x03c0,0x0240
@@ -1172,6 +1235,9 @@ player_y: .word 152
 player_vx: .word 0
 player_vy: .word 0
 player_dir: .byte 0
+player_goal: .byte 0
+player_turn: .byte 0
+pilot_input: .byte 0
 player_invul: .byte 0
 player_bullet: .byte 0
 player_bx: .word 0
@@ -1224,6 +1290,12 @@ bullet_ptr: .word 0
 sound_pitch: .word 1700
 hud_row: .byte 0
 hud_col: .byte 0
+frame_seg: .word 0xb800   # offscreen CGA canvas, allocated separately in DOS
+dirty_left: .space 192
+dirty_right: .space 192
+mark_l: .byte 0
+mark_r: .byte 0
+mark_end_y: .word 0
 bg_buf: .space 16384
 
 start:
@@ -1247,6 +1319,207 @@ start:
     int 0x21
     mov ax,0x4c00
     int 0x21
+# Offscreen compositor: no erase/draw/erase sequence is ever sent to CGA VRAM.
+# The DOS process first shrinks its own memory block, then allocates 16KB.
+# If a very small DOS machine refuses, retain the direct-CGA fallback.
+frame_alloc:
+    push ax
+    push bx
+    push es
+    mov ax,cs
+    mov es,ax
+    mov bx,0x1100
+    mov ah,0x4a
+    int 0x21
+    jc frame_alloc_end
+    mov bx,0x400
+    mov ah,0x48
+    int 0x21
+    jc frame_alloc_end
+    mov [frame_seg],ax
+frame_alloc_end:
+    pop es
+    pop bx
+    pop ax
+    ret
+
+copy_background_to_frame:
+    cmp word ptr [frame_seg],0xb800
+    je frame_copy_end
+    push ax
+    push es
+    push si
+    push di
+    push cx
+    mov ax,[frame_seg]
+    mov es,ax
+    mov si,offset bg_buf
+    xor di,di
+    mov cx,8192
+    rep movsw
+    pop cx
+    pop di
+    pop si
+    pop es
+    pop ax
+frame_copy_end:
+    ret
+
+# Commit one complete composed game board (256 x 192) per tick.
+# Preserves the 64-pixel right-side HUD already printed in B800 memory.
+# Flags start with an empty horizontal interval for each gameboard scanline.
+dirty_reset:
+    push ax
+    push cx
+    push di
+    push es
+    push ds
+    pop es
+    mov di,offset dirty_left
+    mov ax,0x4040
+    mov cx,96
+    rep stosw
+    mov di,offset dirty_right
+    xor ax,ax
+    mov cx,96
+    rep stosw
+    pop es
+    pop di
+    pop cx
+    pop ax
+    ret
+
+# Mark a 56x56 dirty footprint around center AX/BX; gameplay clips x0..255,
+# y0..191. All rectangles are merged into one horizontal span per scanline.
+mark_dirty:
+    cmp word ptr [frame_seg],0xb800
+    je md_done
+    push ax
+    push bx
+    push cx
+    push dx
+    push si
+    push di
+    mov cx,ax
+    sub cx,28
+    jns md_left_valid
+    xor cx,cx
+md_left_valid:
+    shr cx,1
+    shr cx,1
+    mov [mark_l],cl
+    mov dx,ax
+    add dx,28
+    cmp dx,255
+    jbe md_right_valid
+    mov dx,255
+md_right_valid:
+    shr dx,1
+    shr dx,1
+    inc dx
+    mov [mark_r],dl
+    mov si,bx
+    sub si,28
+    jns md_top_valid
+    xor si,si
+md_top_valid:
+    mov di,bx
+    add di,28
+    cmp di,191
+    jbe md_bottom_valid
+    mov di,191
+md_bottom_valid:
+    mov [mark_end_y],di
+md_row:
+    mov al,[mark_l]
+    cmp [dirty_left+si],al
+    jbe md_skip_left
+    mov [dirty_left+si],al
+md_skip_left:
+    mov al,[mark_r]
+    cmp [dirty_right+si],al
+    jae md_skip_right
+    mov [dirty_right+si],al
+md_skip_right:
+    inc si
+    cmp si,[mark_end_y]
+    jbe md_row
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+md_done:
+    ret
+
+# Only final composed pixels touch CGA RAM; untouched rows and columns are
+# never written. This avoids blanked sprites while staying near XT throughput.
+present_board:
+    cmp word ptr [frame_seg],0xb800
+    je present_done
+    push ax
+    push bx
+    push cx
+    push dx
+    push si
+    push di
+    push bp
+    push es
+    push ds
+    mov ax,[frame_seg]
+    mov ds,ax
+    mov ax,0xb800
+    mov es,ax
+    xor bp,bp
+present_scan:
+    mov al,cs:[dirty_left+bp]
+    mov ah,cs:[dirty_right+bp]
+    cmp al,ah
+    jae present_scan_next
+    mov bx,bp
+    shr bx,1
+    mov si,bx
+    shl si,1
+    shl si,1
+    shl si,1
+    shl si,1
+    shl bx,1
+    shl bx,1
+    shl bx,1
+    shl bx,1
+    shl bx,1
+    shl bx,1
+    add si,bx
+    test bp,1
+    jz present_even
+    add si,8192
+present_even:
+    mov di,si
+    mov al,cs:[dirty_left+bp]
+    xor ah,ah
+    add si,ax
+    add di,ax
+    mov cl,cs:[dirty_right+bp]
+    sub cl,al
+    xor ch,ch
+    rep movsb
+present_scan_next:
+    inc bp
+    cmp bp,192
+    jb present_scan
+    pop ds
+    pop es
+    pop bp
+    pop di
+    pop si
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+present_done:
+    ret
+
 live_start:
     mov ax,0x3509
     int 0x21
@@ -1260,6 +1533,7 @@ live_start:
     mov dx,0x3d9
     mov al,0x21
     out dx,al
+    call frame_alloc
     call init_game
     call init_draw
     call read_bios_tick
@@ -1277,9 +1551,14 @@ main_loop:
     jne main_loop
     cmp byte ptr [screen_state],0
     jne main_loop
+    call dirty_reset
     call erase_objects
     call physics_tick
     call draw_objects
+    cmp byte ptr [screen_state],0
+    jne main_no_present
+    call present_board
+main_no_present:
     inc word ptr [tick_count]
     mov ax,[tick_count]
     and al,7
@@ -1358,7 +1637,7 @@ init_game:
     mov byte ptr [score],0
     mov byte ptr [lives],3
     mov byte ptr [wave_total],0
-    mov byte ptr [next_spawn],28
+    mov byte ptr [next_spawn],55
     mov byte ptr [mine_on],0
     mov byte ptr [player_bullet],0
     mov byte ptr [player_invul],0
@@ -1369,6 +1648,9 @@ init_game:
     mov word ptr [player_vx],0
     mov word ptr [player_vy],0
     mov byte ptr [player_dir],0
+    mov byte ptr [player_goal],0
+    mov byte ptr [player_turn],0
+    mov byte ptr [pilot_input],0
     push es
     push ds
     pop es
@@ -1383,9 +1665,12 @@ init_game:
 init_draw:
     call build_background
     call screen_blit
+    call copy_background_to_frame
     call hud_static
     call hud_update
+    call dirty_reset
     call draw_objects
+    call present_board
     ret
 
 build_background:
@@ -1546,6 +1831,7 @@ screen_blit:
 
 # Restore a 16x16 aligned region behind an entity at AX,BX center.
 restore_box:
+    call mark_dirty
     push ax
     push bx
     push cx
@@ -1575,7 +1861,7 @@ rb_ypos:
     mov bx,136
 rb_yok:
     mov [box_y],bx
-    mov ax,0xb800
+    mov ax,[frame_seg]
     mov es,ax
     mov bp,56
 rb_row:
@@ -1629,7 +1915,7 @@ put_pixel:
     push di
     push es
     mov si,ax
-    mov ax,0xb800
+    mov ax,[frame_seg]
     mov es,ax
     mov bx,dx
     shr bx,1
@@ -1680,6 +1966,13 @@ pp_oob:
 
 # sprite_x/y, ptr and color are globals. pixel coordinates x/y are centers.
 draw_sprite:
+    push ax
+    push bx
+    mov ax,[sprite_x]
+    mov bx,[sprite_y]
+    call mark_dirty
+    pop bx
+    pop ax
     push ax
     push bx
     push cx
@@ -1776,6 +2069,13 @@ ship_skip16:
 draw_ship24:
     push ax
     push bx
+    mov ax,[sprite_x]
+    mov bx,[sprite_y]
+    call mark_dirty
+    pop bx
+    pop ax
+    push ax
+    push bx
     push cx
     push dx
     push si
@@ -1787,7 +2087,7 @@ draw_ship24:
     mov dx,[sprite_y]
     sub dx,12
     mov bp,24
-    mov ax,0xb800
+    mov ax,[frame_seg]
     mov es,ax
 sh24_row:
     mov ax,dx
@@ -2080,33 +2380,107 @@ pt_done:
 # Accelerate automatically by 1/8 px/tick while input is held.
 # On release, friction reduces velocity by 1/8 px/tick giving a 1-3 tile coast.
 player_physics:
-    xor bx,bx       # desired x sign: FF,0,1
-    xor cx,cx       # desired y sign
+    # WASD controls the helm, not a sideways teleport. New headings take
+    # longer to settle when the destroyer already carries momentum.
+    mov byte ptr [pilot_input],0
+    mov al,0xff
     cmp byte ptr [key_state+0x11],0
-    je pf_no_w
-    mov cx,-1
-    mov byte ptr [player_dir],0
-pf_no_w:
+    je pf_key_d
+    mov al,0
+pf_key_d:
     cmp byte ptr [key_state+0x20],0
-    je pf_no_d
-    mov bx,1
-    mov byte ptr [player_dir],1
-pf_no_d:
+    je pf_key_s
+    mov al,1
+pf_key_s:
     cmp byte ptr [key_state+0x1f],0
-    je pf_no_s
-    mov cx,1
-    mov byte ptr [player_dir],2
-pf_no_s:
+    je pf_key_a
+    mov al,2
+pf_key_a:
     cmp byte ptr [key_state+0x1e],0
-    je pf_no_a
+    je pf_key_done
+    mov al,3
+pf_key_done:
+    cmp al,0xff
+    je pf_coast
+    mov byte ptr [pilot_input],1
+    cmp al,[player_dir]
+    je pf_helm_settled
+    cmp al,[player_goal]
+    je pf_helm_pending
+    mov [player_goal],al
+    mov byte ptr [player_turn],4
+    # At higher speed a rudder turn takes significantly longer.
+    push ax
+    mov ax,[player_vx]
+    test ax,ax
+    jns pf_vx_abs
+    neg ax
+pf_vx_abs:
+    mov bx,[player_vy]
+    test bx,bx
+    jns pf_vy_abs
+    neg bx
+pf_vy_abs:
+    cmp bx,ax
+    jbe pf_fast_known
+    mov ax,bx
+pf_fast_known:
+    cmp ax,10
+    jb pf_helm_timing
+    mov byte ptr [player_turn],7
+    cmp ax,20
+    jb pf_helm_timing
+    mov byte ptr [player_turn],11
+pf_helm_timing:
+    pop ax
+pf_helm_pending:
+    cmp byte ptr [player_turn],0
+    je pf_helm_complete
+    dec byte ptr [player_turn]
+    jnz pf_hold_course
+pf_helm_complete:
+    mov al,[player_goal]
+    mov [player_dir],al
+    jmp pf_helm_settled
+pf_hold_course:
+    mov al,[player_dir]
+pf_helm_settled:
+    xor bx,bx
+    xor cx,cx
+    cmp al,0
+    jne pf_drive_east
+    mov cx,-1
+    jmp pf_propulsion
+pf_drive_east:
+    cmp al,1
+    jne pf_drive_south
+    mov bx,1
+    jmp pf_propulsion
+pf_drive_south:
+    cmp al,2
+    jne pf_drive_west
+    mov cx,1
+    jmp pf_propulsion
+pf_drive_west:
     mov bx,-1
-    mov byte ptr [player_dir],3
-pf_no_a:
+pf_propulsion:
+    # Thrust rises every other frame; releasing the helm still coasts.
+    test byte ptr [tick_count],1
+    jnz pf_integrate
     mov ax,[player_vx]
     call approach_vx
     mov ax,[player_vy]
     xchg bx,cx
     call approach_vy
+    jmp pf_integrate
+pf_coast:
+    mov byte ptr [player_turn],0
+    xor bx,bx
+    mov ax,[player_vx]
+    call approach_vx
+    mov ax,[player_vy]
+    call approach_vy
+pf_integrate:
     mov ax,[player_fx]
     add ax,[player_vx]
     mov [tmpx],ax
@@ -2591,7 +2965,7 @@ enemy_spawn_tick:
     jae esp_done
     dec byte ptr [next_spawn]
     jnz esp_done
-    mov byte ptr [next_spawn],42
+    mov byte ptr [next_spawn],80
     mov si,offset ship_enemies
     mov cx,MAX_ENEMIES
 esp_find:
@@ -2612,9 +2986,9 @@ esp_create:
     shl bx,1
     mov ax,[spawn_x+bx]
     mov [si+2],ax
-    mov word ptr [si+4],22
+    mov word ptr [si+4],24
     mov byte ptr [si+6],2
-    mov byte ptr [si+7],30
+    mov byte ptr [si+7],110
     mov byte ptr [si+8],0
     mov byte ptr [si+9],0
     mov byte ptr [si+10],0
@@ -2671,7 +3045,7 @@ et_cool:
     dec byte ptr [si+7]
     jmp et_next
 et_shoot:
-    mov byte ptr [si+7],72
+    mov byte ptr [si+7],100
     call enemy_fire
 et_next:
     add si,EN_SIZE
@@ -2685,6 +3059,7 @@ enemy_move:
     push bx
     push cx
     push dx
+    push di
     mov ax,[si+2]
     mov bx,[si+4]
     mov dl,[si+6]
@@ -2694,24 +3069,71 @@ enemy_move:
     mov dl,[si+10]
     jmp em_attempt
 em_target:
-    # A heavy hull holds a heading; it cannot pivot every pixel.
-    mov cl,byte ptr [tick_count]
-    and cl,7
-    jz em_newcourse
+    # The map is followed at grid centers only. Between centers a large
+    # hull keeps its previous course instead of twitching at each pixel.
+    mov cx,ax
+    and cx,15
+    cmp cx,8
+    jne em_follow_course
+    mov cx,bx
+    and cx,15
+    cmp cx,8
+    jne em_follow_course
+    mov cx,bx
+    shr cx,1
+    shr cx,1
+    shr cx,1
+    shr cx,1
+    shl cx,1
+    shl cx,1
+    shl cx,1
+    shl cx,1
+    mov di,ax
+    shr di,1
+    shr di,1
+    shr di,1
+    shr di,1
+    add di,cx
+    # The four active NPCs choose four non-overlapping tactical stations.
+    push bx
+    mov bx,offset nav_dir_0
+    cmp si,offset ship_enemies
+    je em_fetch_flow
+    mov bx,offset nav_dir_1
+    cmp si,offset ship_enemies+EN_SIZE
+    je em_fetch_flow
+    mov bx,offset nav_dir_2
+    cmp si,offset ship_enemies+2*EN_SIZE
+    je em_fetch_flow
+    mov bx,offset nav_dir_3
+em_fetch_flow:
+    mov dl,[bx+di]
+    pop bx
+    cmp dl,5
+    jne em_nav_direction
+    # At a firing station hold position long enough to aim, then take
+    # a 32-pixel patrol loop. Never freeze permanently at the same target.
+    inc byte ptr [si+8]
+    cmp byte ptr [si+8],88
+    jb em_station_aim
+    mov byte ptr [si+8],0
+    mov byte ptr [si+9],32
+    mov byte ptr [si+10],0
+em_station_aim:
+    mov byte ptr [si+6],2
+    cmp si,offset ship_enemies+EN_SIZE
+    jne em_station_right
+    mov byte ptr [si+6],1
+em_station_right:
+    cmp si,offset ship_enemies+2*EN_SIZE
+    jne em_done
+    mov byte ptr [si+6],3
+    jmp em_done
+em_nav_direction:
+    cmp dl,4
+    jne em_attempt
+em_follow_course:
     mov dl,[si+6]
-    jmp em_attempt
-em_newcourse:
-    cmp ax,128
-    jb em_right
-    cmp ax,143
-    ja em_left
-    mov dl,2
-    jmp em_attempt
-em_right:
-    mov dl,1
-    jmp em_attempt
-em_left:
-    mov dl,3
 em_attempt:
     mov [si+6],dl
     cmp dl,0
@@ -2736,55 +3158,125 @@ em_probe:
     call check_water
     cmp byte ptr [check_result],0
     jne em_blocked
+    call enemy_hull_clear
+    jc em_blocked
     mov [si+2],ax
     mov [si+4],bx
     mov byte ptr [si+8],0
     jmp em_done
 em_blocked:
+    # Hold position rather than reversing into the harbor or into another ship.
+    # When lanes open up the precomputed route automatically resumes.
     inc byte ptr [si+8]
-    # A blocked unit first tries an alternate side; if blocked again
-    # it commits to the other direction for a longer traverse.
-    mov al,[si+6]
-    add al,1
-    and al,3
-    cmp byte ptr [si+8],3
-    jb em_set_detour
-    mov al,[si+6]
-    add al,3
-    and al,3
+    cmp byte ptr [si+8],40
+    jb em_done
     mov byte ptr [si+8],0
-em_set_detour:
-    mov [si+10],al
-    mov byte ptr [si+9],24
+    # A hard obstruction pauses the retreat and re-evaluates at next cell center.
+    mov byte ptr [si+9],0
 em_done:
+    pop di
     pop dx
     pop cx
     pop bx
     pop ax
     ret
 
+# AX/BX proposed hull center; carry means another enemy blocks a 24px berth.
+# Prevents NPC stacking at spawn lanes, obstacles and near harbor.
+enemy_hull_clear:
+    push cx
+    push dx
+    push di
+    mov di,offset ship_enemies
+    mov cx,MAX_ENEMIES
+ehc_scan:
+    cmp di,si
+    je ehc_next
+    cmp byte ptr [di],0
+    je ehc_next
+    mov dx,ax
+    sub dx,[di+2]
+    jns ehc_xabs
+    neg dx
+ehc_xabs:
+    cmp dx,23
+    jae ehc_next
+    mov dx,bx
+    sub dx,[di+4]
+    jns ehc_yabs
+    neg dx
+ehc_yabs:
+    cmp dx,21
+    jae ehc_next
+    stc
+    jmp ehc_done
+ehc_next:
+    add di,EN_SIZE
+    loop ehc_scan
+    clc
+ehc_done:
+    pop di
+    pop dx
+    pop cx
+    ret
+
 # One projectile per enemy; a submarine uses a torpedo with bubbles.
 enemy_fire:
-    # Skip broad random blind fire. Aimed launch only when forward corridor
-    # leads toward harbor or near player.
+    # Fire on reachable targets only; don't shoot into empty ocean.
     mov al,[si+6]
     cmp al,2
-    jne ef_north
+    jne ef_not_south
     mov ax,[si+2]
     sub ax,136
-    jns ef_dx_pos
+    jns ef_south_xpos
     neg ax
-ef_dx_pos:
+ef_south_xpos:
     cmp ax,12
     ja ef_done_fast
+    cmp word ptr [si+4],112
+    jb ef_done_fast
     jmp ef_fire_ok
-ef_north:
+ef_not_south:
+    cmp al,0
+    je ef_aim_north
+    mov ax,[si+4]
+    sub ax,[player_y]
+    jns ef_side_ypos
+    neg ax
+ef_side_ypos:
+    cmp ax,20
+    ja ef_done_fast
+    mov ax,[player_x]
+    # Use ship heading in memory; AX contains player X now.
+    cmp byte ptr [si+6],1
+    jne ef_side_left
+    cmp ax,[si+2]
+    jbe ef_done_fast
+    sub ax,[si+2]
+    cmp ax,90
+    ja ef_done_fast
+    jmp ef_fire_ok
+ef_side_left:
+    cmp ax,[si+2]
+    jae ef_done_fast
+    mov dx,[si+2]
+    sub dx,ax
+    cmp dx,90
+    ja ef_done_fast
+    jmp ef_fire_ok
+ef_aim_north:
     mov ax,[si+2]
     sub ax,[player_x]
-    jns ef_nxpos
+    jns ef_north_xpos
     neg ax
-ef_nxpos:
-    cmp ax,10
+ef_north_xpos:
+    cmp ax,14
+    ja ef_done_fast
+    mov ax,[si+4]
+    cmp ax,[player_y]
+    jbe ef_done_fast
+    sub ax,[player_y]
+    cmp ax,90
     ja ef_done_fast
 ef_fire_ok:
     push ax
@@ -3018,12 +3510,7 @@ eo_snext:
     ret
 
 draw_objects:
-    # Shield flash only during brief respawn; no unrelated global blinking.
-    mov ax,[tick_count]
-    and al,2
-    jz do_player
-    cmp byte ptr [player_invul],0
-    jne do_player_skip
+    # Ship silhouette remains visible during respawn protection.
 do_player:
     mov ax,[player_x]
     mov [sprite_x],ax
@@ -3133,7 +3620,7 @@ tests_run:
     call init_game
     cmp byte ptr [map_tiles+184],'H'
     jne test_fail
-    cmp byte ptr [map_tiles+40],'R'
+    cmp byte ptr [map_tiles+51],'R'
     jne test_fail
     mov word ptr [player_vx],28
     xor bx,bx
@@ -3165,6 +3652,30 @@ tests_run:
     call step_projectile
     cmp bx,58
     jne test_fail
+    # Helm MUST not switch instantly while the hull still turns.
+    call init_game
+    mov byte ptr [key_state+0x20],1
+    call player_physics
+    cmp byte ptr [player_dir],0
+    jne test_fail
+    mov byte ptr [key_state+0x20],0
+    # Two nearby active enemy hulls must not be allowed to overlap.
+    mov si,offset ship_enemies
+    mov byte ptr [si],1
+    mov word ptr [si+2],96
+    mov word ptr [si+4],80
+    mov di,offset ship_enemies+EN_SIZE
+    mov byte ptr [di],1
+    mov word ptr [di+2],124
+    mov word ptr [di+4],80
+    mov ax,111
+    mov bx,80
+    call enemy_hull_clear
+    jnc test_fail
+    mov ax,180
+    mov bx,80
+    call enemy_hull_clear
+    jc test_fail
     ret
 test_fail:
     mov ax,0x4c01
@@ -3177,30 +3688,69 @@ capture_start:
     mov dx,0x3d9
     mov al,0x21
     out dx,al
+    call frame_alloc
     call init_game
     call init_draw
+    mov dx,offset cap_mem
+    mov si,offset frame_seg
+    mov cx,2
+    call capture_ds
     mov si,offset cap_a
     call capture_screen
     mov word ptr [tick_count],0
-    mov bp,120
+    mov bp,600
 cap_step:
-    cmp bp,118
+    cmp bp,598
     jne cap_no_thrust
     mov byte ptr [key_state+0x20],1    # synthetic D input, game test only
 cap_no_thrust:
-    cmp bp,86
+    cmp bp,566
     jne cap_pre_move
     mov byte ptr [key_state+0x20],0
 cap_pre_move:
+    call dirty_reset
     call erase_objects
     call physics_tick
     call draw_objects
+    cmp byte ptr [screen_state],0
+    jne cap_no_present
+    call present_board
+cap_no_present:
     inc word ptr [tick_count]
-    cmp bp,82
+    cmp bp,300
     jne cap_no_mid
     mov si,offset cap_mid
     call capture_screen
 cap_no_mid:
+    # Five snapshots at roughly 100-step intervals for AI spacing analysis.
+    cmp bp,500
+    jne cap_test200
+    mov dx,offset cap_s100
+    jmp cap_state_dump
+cap_test200:
+    cmp bp,400
+    jne cap_test300
+    mov dx,offset cap_s200
+    jmp cap_state_dump
+cap_test300:
+    cmp bp,300
+    jne cap_test400
+    mov dx,offset cap_s300
+    jmp cap_state_dump
+cap_test400:
+    cmp bp,200
+    jne cap_test500
+    mov dx,offset cap_s400
+    jmp cap_state_dump
+cap_test500:
+    cmp bp,100
+    jne cap_next_step
+    mov dx,offset cap_s500
+cap_state_dump:
+    mov si,offset ship_enemies
+    mov cx,MAX_ENEMIES*EN_SIZE
+    call capture_ds
+cap_next_step:
     dec bp
     jnz cap_step
     mov si,offset cap_b
@@ -3208,6 +3758,10 @@ cap_no_mid:
     mov dx,offset cap_state
     mov si,offset ship_enemies
     mov cx,MAX_ENEMIES*EN_SIZE
+    call capture_ds
+    mov dx,offset cap_player
+    mov si,offset player_x
+    mov cx,8
     call capture_ds
     mov ax,0x0003
     int 0x10
