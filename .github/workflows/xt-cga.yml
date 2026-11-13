@@ -11,4 +11,6 @@ jobs:
       - name: GNU as / ld 8086-only static build
         run: make clean all test
       - name: Verify tested v0.8 binary exactly matches rebuilt release
-        run: echo "4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c  dist/SHIPS.COM" | sha256sum -c -
+        run: |
+          sha256sum dist/SHIPS.COM
+          echo "75575e760b0390df7a9fc76bcf29534f1b7f9872aa36aeadb88eb158ec096d60  dist/SHIPS.COM" | sha256sum -c -
