@@ -1,6 +1,6 @@
 # SHIPS — Harbor Defense for IBM PC XT / CGA
 
-**Developer release v0.8, 13 November 2026.** Standalone real-mode DOS 8086/8088 game; original top-down destroyer and submarine combat. **[Download the exact tested SHIPS.COM](dist/SHIPS.COM)** (41,172 bytes, SHA256 `4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c`).
+**Developer release v0.8, 13 November 2026.** Standalone real-mode DOS 8086/8088 game; original top-down destroyer and submarine combat. **[Download the exact tested SHIPS.COM](dist/SHIPS.COM)** (41,171 bytes, SHA256 `75575e760b0390df7a9fc76bcf29534f1b7f9872aa36aeadb88eb158ec096d60`).
 
 ## Real DOSBox-X frames
 
@@ -33,7 +33,7 @@ Defend the harbor against destroyers and semi-submerged submarines with torpedoe
 
 - `SHIPS.COM /TEST` under DOSBox-X 2026.10.01, 8086 + CGA 320×200: **PASS**.
 - 600-step unattended DOSBox-X simulation with enemy coordinates recorded at steps 100,200,300,400,500,600: **zero enemy hull overlaps** in the sampled positions, and movement to independent stations. The unattended test **loses the harbor** because the player does not defend it; this is not a witnessed human victory.
-- New executable size 41,172 bytes, below the 56 KiB 8086 COM budget. Original TANKS installation is separate and untouched.
+- New executable size 41,171 bytes, below the 56 KiB 8086 COM budget. Original TANKS installation is separate and untouched.
 - GitHub Actions compiles the same original source `src/ships.S`, statically checks 8086 ISA and checks exact release binary checksum. See [detailed evidence](docs/TESTING.md).
 
 **Not yet certified:** physical XT 4.77MHz speed, long manual combat victory, native EGA/VGA renderers, AdLib or Sound Blaster auto-detection/music (PC Speaker effects exist). DOSBox-X CGA mode alone does not prove physical CGA behavior.

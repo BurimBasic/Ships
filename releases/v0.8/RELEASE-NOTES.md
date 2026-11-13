@@ -1,6 +1,6 @@
 # SHIPS v0.8 — playable XT/CGA development build
 
-**Date**: 2026-11-13. **File**: `dist/SHIPS.COM`, 41,172 bytes. **SHA256**: `4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c`.
+**Date**: 2026-11-13. **File**: `dist/SHIPS.COM`, 41,171 bytes. **SHA256**: `75575e760b0390df7a9fc76bcf29534f1b7f9872aa36aeadb88eb158ec096d60`.
 
 ### Changes
 

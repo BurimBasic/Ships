@@ -1,14 +1,14 @@
 # SHIPS v0.8 testing evidence — 2026-11-13
 
 **Release binary** `dist/SHIPS.COM` and SLOW1 `C:\Ships\SHIPS.COM`:
-- SHA256: `4ad4cfe08e56c5c6d0c1e04855b28b4e8ac9fb727b1d1ca0dd9533ad2b8a117c`
-- Bytes: **41,172**
+- SHA256: `75575e760b0390df7a9fc76bcf29534f1b7f9872aa36aeadb88eb158ec096d60`
+- Bytes: **41,171**
 - CPU: **8086/8088** (GNU `.arch i8086`, no 186+ instructions)
 - Video: **CGA 320×200, 4 colors**.
 
 ## Test sequence
 
-1. Build on SLOW1 using MSYS2 GNU Binutils 2.47 (`as --32`, PE intermediate with custom DOS image linker script, `objcopy -O binary`); the resulting COM was 41,172 bytes. The source is independently buildable with Linux `make clean all test`.
+1. Build on SLOW1 using MSYS2 GNU Binutils 2.47 (`as --32`, PE intermediate with custom DOS image linker script, `objcopy -O binary`); the Windows intermediate COM was 41,172 bytes ending in one linker padding NOP (0x90); the released image trims that final NOP to 41,171 bytes to be byte-identical to the Linux ELF image. The source is independently buildable with Linux `make clean all test`.
 2. On DOSBox-X 2026.10.01, 8086, CGA, `cycles=fixed 240`: `SHV13.COM /TEST` produced `SHIPS /TEST PASS` and exit code 0.
 3. **Unattended 600-step /CAP run** in DOSBox-X, 8086, CGA at 2000 cycles/ms; saved 3 B800 VRAM frames and all four 12-byte enemy records at six sampling points. No overlaps found at samples 100,200,300,400,500,600, using a 23×21 hull-spacing check.
 4. At step 600, the four active enemies were in distinct positions: **(136,109), (88,136), (184,136), (136,88)**. Recorded movement in multiple earlier intervals; no standing stack at the harbor.
@@ -25,3 +25,5 @@
 ## Rollback
 
 On SLOW1 the previous installed SHIPS.COM is backed up under `C:\Ships\backups\`. Use a separate folder from TANKS. Never overwrite installed release before release checksum and `/TEST` are successful.
+
+Reproducibility repair: the Windows PE-based linker introduced one trailing NOP, absent from the Linux link result. The padded and unpadded images both passed real DOSBox-X /TEST. The distributed file is the **unpadded 41,171-byte version**, matching Linux SHA256 exactly.
